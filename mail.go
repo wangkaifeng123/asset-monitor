@@ -12,9 +12,9 @@ import (
 //{"code":200,"error":false,"message":"OK","data":{"sid":"AZvjVfwKeJuNIGoeuDS8","guide":null}}
 type MailResp struct {
 	Code    int
-	Error   bool
+	Error   interface{}
 	Message string
-	Data    map[string]string
+	Data    interface{}
 }
 
 // var Conf *config.Config = config.InitConfig()
@@ -58,7 +58,7 @@ func MailSend() {
 		if err != nil {
 			log.Println(err)
 		}
-		if mailResp.Error {
+		if mailResp.Code != 200 {
 			log.Println(v, ":Mail send failed")
 			continue
 		}
