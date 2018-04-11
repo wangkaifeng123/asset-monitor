@@ -16,12 +16,12 @@
 		<table border="1" cellspacing="0" style="width: 100%">
 			<tr>
 				<td>币种</td>
-				<td>数量</td>
+				<td>数量(10^8)</td>
 			</tr>
 			{{ range $CoinName, $CoinBalance :=  .InformationAsset}}
 			<tr>
 				<td>{{ $CoinName }}</td>
-				<td>{{ $CoinBalance }}</td>
+				<td>{{ $CoinBalance | printf "%.2f" }}</td>
 			</tr>
 			{{ end }}
 		</table>

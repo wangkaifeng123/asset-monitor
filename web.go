@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -26,15 +26,14 @@ func index(w http.ResponseWriter, r *http.Request) { // /index处理器
 	t.ExecuteTemplate(w, "index", "")
 }
 
-func PraseRecord() []Record {
-
+func PraseRecord(account string) []Record {
 	informationrecord := make([]Record, 0)
 	iter := Db.NewIterator(nil, nil)
 	for iter.Next() {
 		key := iter.Key()
 		value := iter.Value()
 		all := strings.Split(string(key), "_")
-		if string(value) == "true" {
+		if string(value) == "true" && account == all[0] {
 			// do something for the key
 			record := Record{CoinName: all[1], Time: all[2], Number: all[3]}
 			informationrecord = append(informationrecord, record)
@@ -51,27 +50,26 @@ func PraseRecord() []Record {
 func show(w http.ResponseWriter, r *http.Request) { // /show页面
 	// 将r传过来的值与数据库进行比对，若有该账号，才跳转，否则失败
 
-	if r.FormValue("account") == "dd" {
-
-		//读取账户信息
-		body := Post(`{"uid":"9c885ce7664ed3c3675df8e49590c141665d94add5bf72a816a8d8a78bd8fbe5"}`)
-		var informationasset = make(map[string]float64)
-		informationasset = ParsingWeb(body)
-
-		//排序
-		RWMutex.Lock()
-		var informationrecord = PraseRecord()
-		RWMutex.Unlock()
-
-		data := Asset{Account: "9c885ce7664ed3c3675df8e49590c141665d94add5bf72a816a8d8a78bd8fbe5", InformationAsset: informationasset, InformationRecord: informationrecord}
-
-		t := template.New("show.html")
-		t, _ = t.ParseFiles("show.html")
-		t.ExecuteTemplate(w, "show", data)
-	} else {
+	PostContent := `{"uid":"` + r.FormValue("account") + `"}`
+	//读取账户信息
+	body := Post(PostContent)
+	if string(body) == "params error: invalid uid" {
+		//若不存在该账户，则执行show_
 		t := template.New("show_.html")
 		t, _ = t.ParseFiles("show_.html")
 		t.ExecuteTemplate(w, "show_", "")
+		return
 	}
-	fmt.Println("Done")
+	var informationasset = make(map[string]float64)
+	informationasset = ParsingWeb(body)
+
+	RWMutex.Lock()
+	var informationrecord = PraseRecord(r.FormValue("account"))
+	RWMutex.Unlock()
+
+	data := Asset{Account: r.FormValue("account"), InformationAsset: informationasset, InformationRecord: informationrecord}
+
+	t := template.New("show.html")
+	t, _ = t.ParseFiles("show.html")
+	t.ExecuteTemplate(w, "show", data)
 }

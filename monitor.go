@@ -7,16 +7,15 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"log"
 )
 
 var account string
 
 func monitor() {
-	//var Accounts = "9c885ce7664ed3c3675df8e49590c141665d94add5bf72a816a8d8a78bd8fbe5"
-
 	for _, v := range Conf.Accounts {
 		account = v
-
+		log.Println(v)
 		Acc := `{"uid":` + `"` + account + `"` + "}"
 		for {
 			<-CRechargeOK

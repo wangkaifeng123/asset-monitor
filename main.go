@@ -15,7 +15,7 @@ var CData = make(chan map[string][]string, 100) //查询数据信道
 var CMail = make(chan []string, 100)            //发送邮件信道
 var CSms = make(chan []string, 100)             //发送短信信道
 var CRechargeOK = make(chan bool)
-var Path = "C:\\DB"
+var Path = "./DB"
 var reChargeMsg = NewRecharge()
 var reChargeResult RechargeResult
 
